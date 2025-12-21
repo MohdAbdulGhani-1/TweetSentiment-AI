@@ -10,19 +10,33 @@ nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 
 # Load trained XGBoost model & TF-IDF Vectorizer
-try:
-    with open("xgbmodel.pickle", "rb") as model_file:
-        model = pickle.load(model_file)
+import os
+
+model = None
+vectorizer = None
+
+def load_models():
+    global model, vectorizer
+    model_path = "xgbmodel.pickle"
+    vectorizer_path = "TfidfVectorizer.pickle"
     
-    with open("TfidfVectorizer.pickle", "rb") as vectorizer_file:
-        vectorizer = pickle.load(vectorizer_file)
+    try:
+        if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+            with open(model_path, "rb") as model_file:
+                model = pickle.load(model_file)
+            
+            with open(vectorizer_path, "rb") as vectorizer_file:
+                vectorizer = pickle.load(vectorizer_file)
 
-    if not hasattr(vectorizer, "idf_"):  # Ensure vectorizer is fitted
-        raise ValueError("Error: TfidfVectorizer is not fitted!")
+            if not hasattr(vectorizer, "idf_"):
+                raise ValueError("Error: TfidfVectorizer is not fitted!")
+            print("✓ Models loaded successfully")
+        else:
+            print("⚠ Warning: Pickle files not found. Models not loaded.")
+    except Exception as e:
+        print(f"Error loading models: {e}")
 
-except FileNotFoundError as e:
-    print(f"Error: {e}")
-    exit()
+load_models()
 
 users ={}
 # Flask app
