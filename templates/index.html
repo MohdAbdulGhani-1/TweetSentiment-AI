@@ -65,6 +65,13 @@
     <div class="container">
         <h1>Review Sentiment Analysis</h1>
         <p>Enter a review to predict its sentiment.</p>
+        
+        {% if error %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 5px; margin-bottom: 15px;">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        
         <form action="/predict" method="POST">
             <input type="text" name="tweetText" placeholder="Enter tweet" required>
             <button type="submit">Predict</button>
