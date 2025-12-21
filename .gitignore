@@ -18,6 +18,8 @@ data/
 # Model files
 *.pkl
 models/
+# Note: Keep pickle files for deployment
+# *.pickle
 
 # OS files
 Thumbs.db
