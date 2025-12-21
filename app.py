@@ -97,16 +97,21 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    tweet_text = request.form.get("tweetText", "").strip()  # Ensure name matches HTML form
+    tweet_text = request.form.get("tweetText", "").strip()
 
     if not tweet_text:
-        return render_template("index.html", error="Tweet text is required!")  # Stay on the same page
+        return render_template("index.html", error="Tweet text is required!")
 
     print("Raw Input:", tweet_text)
 
     try:
+        # Check if models are loaded
+        if model is None or vectorizer is None:
+            print("ERROR: Models not loaded!")
+            return render_template("index.html", error="Models are not loaded. Please contact administrator.")
+        
         processed_tweet = vectorizer.transform([preprocess_text(tweet_text)])
-        print("Processed Text:", processed_tweet)
+        print("Processed Text shape:", processed_tweet.shape)
 
         prediction = model.predict(processed_tweet)[0]
         print("Prediction:", prediction)
@@ -117,8 +122,13 @@ def predict():
         return render_template("result.html", tweet=tweet_text, result=predicted_label)
 
     except Exception as e:
-        print(f"Prediction Error: {e}")
-        return render_template("index.html", error="Error in processing the tweet!")
+        import traceback
+        error_msg = f"Prediction Error: {str(e)}"
+        print(error_msg)
+        print(traceback.format_exc())
+        return render_template("index.html", error=error_msg)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
